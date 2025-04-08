@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agência de Viagens</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>TravelManager</h1>
+
+    <!-- Formulário para cadastrar viagens -->
+    <form id="formViagem">
+        <input type="text" id="destino" placeholder="Destino" required>
+        <input type="date" id="data_viagem" required>
+        <input type="number" id="preco" placeholder="Preço (R$)" required>
+        <input type="number" id="vagas" placeholder="Vagas" required>
+        <button type="submit">Cadastrar Viagem</button>
+    </form>
+
+      <!-- Tabela para listar viagens -->
+      <h2>Lista de Viagens</h2>
+      <table>
+          <thead>
+              <tr>
+                  <th>ID</th>
+                  <th>Destino</th>
+                  <th>Data</th>
+                  <th>Preço</th>
+                  <th>Vagas</th>
+              </tr>
+          </thead>
+          <tbody id="listaViagens">
+              <!-- Os dados serão inseridos aqui -->
+          </tbody>
+      </table>
+   
+      <script>
+          const apiUrl = 'http://localhost:8083';
+
+        // Cadastrar viagem
+        document.getElementById('formViagem').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const destino = document.getElementById('destino').value;
+            const data_viagem = document.getElementById('data_viagem').value;
+            const preco = document.getElementById('preco').value;
+            const vagas = document.getElementById('vagas').value;
+
+            const response = await fetch(`${apiUrl}/viagens`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ destino, data_viagem, preco, vagas })
+            });
+
+            if (response.ok) {
+                alert('Viagem cadastrada com sucesso!');
+                listarViagens(); // Atualiza a lista de viagens
+                e.target.reset();
+            } else {
+                alert('Erro ao cadastrar viagem.');
+            }
+        });
+
+         // Listar viagens
+         async function listarViagens() {
+            const response = await fetch(`${apiUrl}/viagens`);
+            const viagens = await response.json();
+            const listaViagens = document.getElementById('listaViagens');
+            listaViagens.innerHTML = '';
+ 
+            viagens.forEach(viagem => {
+                const row = `
+                    <tr>
+                        <td>${viagem.id}</td>
+                        <td>${viagem.destino}</td>
+                        <td>${viagem.data_viagem}</td>
+                        <td>R$ ${parseFloat(viagem.preco).toFixed(2)}</td>
+                        <td>${viagem.vagas}</td>
+                    </tr>
+                `;
+                listaViagens.innerHTML += row;
+            });
+        }
+ 
+        // Inicializa a lista ao carregar a página
+        listarViagens();
+    </script>
+</body>
+</html>
