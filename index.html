@@ -1,14 +1,43 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agência de Viagens</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
-    <h1>TravelManager</h1>
-
+    <header>
+        <div class="header-content">
+            <h1>TravelManager</h1>
+            
+        </div>
+    </header>
+ 
+    <h1>Gerenciamento de Viagens</h1>
+ 
     <!-- Formulário para cadastrar viagens -->
     <form id="formViagem">
         <input type="text" id="destino" placeholder="Destino" required>
@@ -17,48 +46,44 @@
         <input type="number" id="vagas" placeholder="Vagas" required>
         <button type="submit">Cadastrar Viagem</button>
     </form>
-
-
+ 
     <button onclick="window.location.href='/listar'">Listar Viagens</button>
  
     <script>
         const apiUrl = 'http://localhost:8083';
-
-       
- // Cadastrar viagem
-document.getElementById('formViagem').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const destino = document.getElementById('destino').value;
-    const data_viagem = document.getElementById('data_viagem').value;
-    const preco = document.getElementById('preco').value;
-    const vagas = document.getElementById('vagas').value;
-
-    const response = await fetch(`${apiUrl}/viagens`, { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ destino, data_viagem, preco, vagas })
-    }); 
-
-    if (response.ok) {
-        alert('Viagem cadastrada com sucesso!');
-        listarViagens(); 
-        e.target.reset();
-    } else {
-        alert('Erro ao cadastrar viagem.');
-    }
-});
-
-
-         // Listar viagens
-         async function listarViagens() {
-            const response = await fetch(`${apiUrl}/viagens`);
-
+ 
+        // Cadastrar viagem
+        document.getElementById('formViagem').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const destino = document.getElementById('destino').value;
+            const data_viagem = document.getElementById('data_viagem').value;
+            const preco = document.getElementById('preco').value;
+            const vagas = document.getElementById('vagas').value;
+ 
+            const response = await fetch(`${apiUrl}/viagens`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ destino, data_viagem, preco, vagas })
+            });
+ 
+            if (response.ok) {
+                alert('Viagem cadastrada com sucesso!');
+                listarViagens(); // Atualiza a lista de viagens
+                e.target.reset();
+            } else {
+                alert('Erro ao cadastrar viagem.');
+            }
+        });
+ 
+        // Listar viagens
+        async function listarViagens() {
+            const response = await fetch(`${apiUrl}/listar`);
             const viagens = await response.json();
             const listaViagens = document.getElementById('listaViagens');
             listaViagens.innerHTML = '';
  
             viagens.forEach(viagem => {
-                const row = 
+                const row = `
                     <tr>
                         <td>${viagem.id}</td>
                         <td>${viagem.destino}</td>
@@ -66,14 +91,10 @@ document.getElementById('formViagem').addEventListener('submit', async (e) => {
                         <td>R$ ${parseFloat(viagem.preco).toFixed(2)}</td>
                         <td>${viagem.vagas}</td>
                     </tr>
-                ;
+                `;
                 listaViagens.innerHTML += row;
             });
-            
-
         }
-
-        
  
         // Inicializa a lista ao carregar a página
         listarViagens();
